@@ -193,8 +193,8 @@ export default function App() {
         filename: `programa-${state.template}-${new Date().toISOString().split('T')[0]}.pdf`,
         image: { type: 'png', quality: 1.0 },
         html2canvas: {
-          scale: 3,
-          dpi: 300,
+          scale: 4,
+          dpi: 600,
           useCORS: true,
           allowTaint: true,
           logging: false,
@@ -214,9 +214,18 @@ export default function App() {
             if (clonedElement) {
               clonedElement.style.transform = 'none';
               clonedElement.style.transformOrigin = 'top left';
+              // Force high-quality text rendering
               (clonedElement.style as any).fontSmooth = 'always';
               (clonedElement.style as any).webkitFontSmoothing = 'antialiased';
               (clonedElement.style as any).MozOsxFontSmoothing = 'grayscale';
+              (clonedElement.style as any).textRendering = 'optimizeLegibility';
+
+              // Ensure all text is crisp
+              const textElements = clonedElement.querySelectorAll('*');
+              textElements.forEach((el: any) => {
+                el.style.webkitFontSmoothing = 'antialiased';
+                el.style.mozOsxFontSmoothing = 'grayscale';
+              });
             }
           }
         },
@@ -225,9 +234,9 @@ export default function App() {
           format: [816, 1056],
           orientation: 'portrait',
           compress: true,
-          precision: 16,
+          precision: 32,
           putOnlyUsedFonts: true,
-          floatPrecision: 16
+          floatPrecision: 32
         }
       };
 
