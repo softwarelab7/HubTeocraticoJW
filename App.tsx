@@ -24,7 +24,7 @@ export default function App() {
           template: 'acomodadores',
           months: [],
           styles: INITIAL_STYLES,
-          banner: { image: null, zoom: 1, x: 0, y: 0 },
+          banner: { image: null, zoom: 1, x: 0, y: 0, showBanner: true },
           language: 'es',
           theme: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
           colorTheme: 'blue',
@@ -38,7 +38,7 @@ export default function App() {
       template: 'acomodadores',
       months: [],
       styles: INITIAL_STYLES,
-      banner: { image: null, zoom: 1, x: 0, y: 0 },
+      banner: { image: null, zoom: 1, x: 0, y: 0, showBanner: true },
       language: 'es',
       theme: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
       colorTheme: 'blue'
@@ -97,8 +97,11 @@ export default function App() {
   const updateState = React.useCallback((updates: Partial<AppState>) => {
     setState(prev => {
       const newState = { ...prev, ...updates };
-      if (newState.template === 'acomodadores' && newState.months.length > 3) {
-        newState.months = newState.months.slice(0, 3);
+      const currentBannerState = updates.banner !== undefined ? updates.banner : prev.banner;
+      const maxMonths = currentBannerState.showBanner === false ? 4 : 3;
+
+      if (newState.template === 'acomodadores' && newState.months.length > maxMonths) {
+        newState.months = newState.months.slice(0, maxMonths);
       }
       return newState;
     });
@@ -132,7 +135,7 @@ export default function App() {
         }))
       }],
       styles: INITIAL_STYLES,
-      banner: { image: null, zoom: 1, x: 0, y: 0 },
+      banner: { image: null, zoom: 1, x: 0, y: 0, showBanner: true },
       language: 'es',
       theme: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
       colorTheme: 'blue'
@@ -164,100 +167,10 @@ export default function App() {
     }
   };
 
-  const downloadPDF = async () => {
-    setIsGeneratingPDF(true);
-    try {
-      const content = document.getElementById('pdf-content');
-      if (!content) {
-        alert('No se pudo encontrar el contenido para exportar');
-        return;
-      }
-
-      // @ts-ignore
-      if (typeof window.html2pdf === 'undefined') {
-        alert('La librería html2pdf no está disponible. Por favor recarga la página.');
-        return;
-      }
-
-      // Save original transform and remove it temporarily
-      const originalTransform = content.style.transform;
-      const originalTransformOrigin = content.style.transformOrigin;
-      content.style.transform = 'none';
-      content.style.transformOrigin = 'top left';
-
-      // Wait a bit for the DOM to update
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      const opt = {
-        margin: 0,
-        filename: `programa-${state.template}-${new Date().toISOString().split('T')[0]}.pdf`,
-        image: { type: 'png', quality: 1.0 },
-        html2canvas: {
-          scale: 4,
-          dpi: 600,
-          useCORS: true,
-          allowTaint: true,
-          logging: false,
-          letterRendering: true,
-          backgroundColor: '#ffffff',
-          width: 816,
-          height: 1056,
-          windowWidth: 816,
-          windowHeight: 1056,
-          imageTimeout: 0,
-          x: 0,
-          y: 0,
-          scrollX: 0,
-          scrollY: 0,
-          onclone: (clonedDoc: Document) => {
-            const clonedElement = clonedDoc.getElementById('pdf-content');
-            if (clonedElement) {
-              clonedElement.style.transform = 'none';
-              clonedElement.style.transformOrigin = 'top left';
-              // Force high-quality text rendering
-              (clonedElement.style as any).fontSmooth = 'always';
-              (clonedElement.style as any).webkitFontSmoothing = 'antialiased';
-              (clonedElement.style as any).MozOsxFontSmoothing = 'grayscale';
-              (clonedElement.style as any).textRendering = 'optimizeLegibility';
-
-              // Ensure all text is crisp
-              const textElements = clonedElement.querySelectorAll('*');
-              textElements.forEach((el: any) => {
-                el.style.webkitFontSmoothing = 'antialiased';
-                el.style.mozOsxFontSmoothing = 'grayscale';
-              });
-            }
-          }
-        },
-        jsPDF: {
-          unit: 'px',
-          format: [816, 1056],
-          orientation: 'portrait',
-          compress: true,
-          precision: 32,
-          putOnlyUsedFonts: true,
-          floatPrecision: 32
-        }
-      };
-
-      // @ts-ignore
-      await window.html2pdf().from(content).set(opt).save();
-
-      // Restore original transform
-      content.style.transform = originalTransform;
-      content.style.transformOrigin = originalTransformOrigin;
-
-    } catch (err: any) {
-      console.error("PDF Export Error:", err);
-      alert(`Error al exportar PDF: ${err.message || 'Error desconocido'}.`);
-
-      const content = document.getElementById('pdf-content');
-      if (content) {
-        content.style.transform = content.style.transform || 'scale(1)';
-      }
-    } finally {
-      setIsGeneratingPDF(false);
-    }
+  const downloadPDF = () => {
+    // Para calidad vectorial nativa (texto real, no imagen pixeleada),
+    // dependemos de la impresión nativa del navegador guardando como PDF.
+    window.print();
   };
 
   const LANGUAGES: { code: Language; label: string }[] = [

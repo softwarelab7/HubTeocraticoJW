@@ -60,8 +60,9 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
     }
   };
 
-  const addMonth = () => {
-    if (state.template === 'acomodadores' && state.months.length >= 3) {
+  const handleAddMonth = () => {
+    const maxMonths = state.banner.showBanner === false ? 4 : 3;
+    if (state.template === 'acomodadores' && state.months.length >= maxMonths) {
       return;
     }
 
@@ -95,7 +96,6 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
       }))
     };
     updateState({ months: [...state.months, newMonth] });
-    setOpenMonths(prev => ({ ...prev, [newMonth.id]: true }));
   };
 
   const removeMonth = (id: string) => {
@@ -176,44 +176,60 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
           <label className="block text-[10px] font-bold text-zinc-700 dark:text-zinc-300 mb-2 uppercase">
             {t.banner}
           </label>
-          <div className="relative group">
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              id="banner-upload"
-              onChange={handleBannerUpload}
-            />
-            <label
-              htmlFor="banner-upload"
-              className={`flex items-center justify-center gap-3 w-full p-2.5 rounded-lg border-2 border-dashed cursor-pointer transition-all ${state.banner.image
-                ? 'border-green-300 dark:border-green-800/50 hover:border-green-500 bg-green-50/30 dark:bg-green-900/10 hover:bg-green-50 dark:hover:bg-green-900/20'
-                : 'border-red-300 dark:border-red-800/50 hover:border-red-500 bg-red-50/30 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20'
-                }`}
+          <div className="flex bg-zinc-100 dark:bg-zinc-900/50 p-1 rounded-lg mb-3">
+            <button
+              onClick={() => updateState({ banner: { ...state.banner, showBanner: true } })}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${state.banner.showBanner !== false ? 'bg-white dark:bg-zinc-700 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${state.banner.image
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
-                : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                }`}>
-                {state.banner.image ? <Check size={16} /> : <Upload size={16} />}
-              </div>
-              <span className={`text-xs font-medium ${state.banner.image ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
-                {state.banner.image ? 'Banner Activo' : t.uploadBanner}
-              </span>
-            </label>
-            {state.banner.image && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  updateState({ banner: { ...state.banner, image: null } });
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors z-10"
-                title="Eliminar Banner"
-              >
-                <Trash2 size={14} />
-              </button>
-            )}
+              Mostrar
+            </button>
+            <button
+              onClick={() => updateState({ banner: { ...state.banner, showBanner: false } })}
+              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${state.banner.showBanner === false ? 'bg-white dark:bg-zinc-700 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+            >
+              Ocultar
+            </button>
           </div>
+          {state.banner.showBanner !== false && (
+            <div className="relative group">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="banner-upload"
+                onChange={handleBannerUpload}
+              />
+              <label
+                htmlFor="banner-upload"
+                className={`flex items-center justify-center gap-3 w-full p-2.5 rounded-lg border-2 border-dashed cursor-pointer transition-all ${state.banner.image
+                  ? 'border-green-300 dark:border-green-800/50 hover:border-green-500 bg-green-50/30 dark:bg-green-900/10 hover:bg-green-50 dark:hover:bg-green-900/20'
+                  : 'border-red-300 dark:border-red-800/50 hover:border-red-500 bg-red-50/30 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20'
+                  }`}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${state.banner.image
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                  : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                  }`}>
+                  {state.banner.image ? <Check size={16} /> : <Upload size={16} />}
+                </div>
+                <span className={`text-xs font-medium ${state.banner.image ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
+                  {state.banner.image ? 'Banner Activo' : t.uploadBanner}
+                </span>
+              </label>
+              {state.banner.image && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    updateState({ banner: { ...state.banner, image: null } });
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors z-10"
+                  title="Eliminar Banner"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -406,14 +422,14 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
 
           <div className="space-y-2">
             <button
-              onClick={addMonth}
-              disabled={state.template === 'acomodadores' && state.months.length >= 3}
-              className={`w-full py-3 rounded-lg border-2 border-dashed font-bold flex items-center justify-center gap-2 transition-all group ${state.template === 'acomodadores' && state.months.length >= 3
+              onClick={handleAddMonth}
+              disabled={state.template === 'acomodadores' && state.months.length >= (state.banner.showBanner === false ? 4 : 3)}
+              className={`w-full py-3 rounded-lg border-2 border-dashed font-bold flex items-center justify-center gap-2 transition-all group ${state.template === 'acomodadores' && state.months.length >= (state.banner.showBanner === false ? 4 : 3)
                 ? 'border-zinc-200 dark:border-zinc-800 text-zinc-300 dark:text-zinc-600 cursor-not-allowed'
                 : 'border-zinc-300 dark:border-zinc-700 text-zinc-500 hover:text-primary hover:border-primary hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
                 }`}
             >
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors shadow-sm ${state.template === 'acomodadores' && state.months.length >= 3
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors shadow-sm ${state.template === 'acomodadores' && state.months.length >= (state.banner.showBanner === false ? 4 : 3)
                 ? 'bg-zinc-50 dark:bg-zinc-900 text-zinc-300 dark:text-zinc-700'
                 : 'bg-zinc-100 dark:bg-zinc-800 group-hover:bg-primary group-hover:text-white'
                 }`}>
@@ -422,9 +438,9 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
               <span className="text-xs uppercase tracking-wide">{t.createNewMonth}</span>
             </button>
 
-            {state.template === 'acomodadores' && state.months.length >= 3 && (
+            {state.template === 'acomodadores' && state.months.length >= (state.banner.showBanner === false ? 4 : 3) && (
               <p className="text-[10px] text-center text-amber-600 dark:text-amber-500 font-medium px-2">
-                Límite de 3 meses alcanzado para esta plantilla.
+                Límite de {state.banner.showBanner === false ? 4 : 3} meses alcanzado para esta plantilla.
               </p>
             )}
           </div>

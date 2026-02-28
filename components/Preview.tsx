@@ -144,105 +144,110 @@ export const Preview: React.FC<Props> = ({ state, updateState, isGenerating }) =
                         </h2>
                     </div>
 
-                    <div
-                        className="bg-zinc-100 rounded-lg overflow-hidden group border border-zinc-200 z-10 w-auto"
-                        style={{ position: 'absolute', top: '5.5rem', left: '1.5rem', right: '1.5rem', height: '12rem' }}
-                    >
-                        {bannerState.image ? (
-                            <div className="w-full h-full relative overflow-hidden">
-                                <img
-                                    src={bannerState.image}
-                                    alt="Banner"
-                                    className="absolute"
-                                    style={{
-                                        transform: `translate(-50%, -50%) scale(${bannerState.zoom}) translate(${bannerState.x}px, ${bannerState.y}px)`,
-                                        left: '50%',
-                                        top: '50%',
-                                        transformOrigin: 'center center'
-                                    }}
-                                />
-                            </div>
-                        ) : (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400">
-                                <ImageIcon size={48} className="mb-2 opacity-50" />
-                                <p className="text-sm font-medium">{t.previewPlaceholder}</p>
-                            </div>
-                        )}
+                    {bannerState.showBanner !== false && (
+                        <div
+                            className="bg-zinc-100 rounded-lg overflow-hidden group border border-zinc-200 z-10 w-auto"
+                            style={{ position: 'absolute', top: '5.5rem', left: '1.5rem', right: '1.5rem', height: '12rem' }}
+                        >
+                            {bannerState.image ? (
+                                <div className="w-full h-full relative overflow-hidden">
+                                    <img
+                                        src={bannerState.image}
+                                        alt="Banner"
+                                        className="absolute"
+                                        style={{
+                                            transform: `translate(-50%, -50%) scale(${bannerState.zoom}) translate(${bannerState.x}px, ${bannerState.y}px)`,
+                                            left: '50%',
+                                            top: '50%',
+                                            transformOrigin: 'center center'
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400">
+                                    <ImageIcon size={48} className="mb-2 opacity-50" />
+                                    <p className="text-sm font-medium">{t.previewPlaceholder}</p>
+                                </div>
+                            )}
 
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
-                            <div className="flex items-center gap-2">
-                                <button onClick={() => moveBanner(0, -10)} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white"><ArrowUp size={16} /></button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={() => moveBanner(-10, 0)} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white"><ArrowLeft size={16} /></button>
-                                <button onClick={() => moveBanner(10, 0)} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white"><ArrowRight size={16} /></button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button onClick={() => moveBanner(0, 10)} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white"><ArrowDown size={16} /></button>
-                            </div>
-                            <div className="flex items-center gap-2 mt-2 w-48 px-4">
-                                <ZoomOut size={16} className="text-white" />
-                                <input
-                                    type="range" min="0.5" max="3" step="0.1"
-                                    value={bannerState.zoom}
-                                    onChange={(e) => setBannerState({ ...bannerState, zoom: parseFloat(e.target.value) })}
-                                    className="w-full h-1 bg-white/50 rounded-lg appearance-none cursor-pointer"
-                                />
-                                <ZoomIn size={16} className="text-white" />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => moveBanner(0, -10)} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white"><ArrowUp size={16} /></button>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => moveBanner(-10, 0)} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white"><ArrowLeft size={16} /></button>
+                                    <button onClick={() => moveBanner(10, 0)} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white"><ArrowRight size={16} /></button>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => moveBanner(0, 10)} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white"><ArrowDown size={16} /></button>
+                                </div>
+                                <div className="flex items-center gap-2 mt-2 w-48 px-4">
+                                    <ZoomOut size={16} className="text-white" />
+                                    <input
+                                        type="range" min="0.5" max="3" step="0.1"
+                                        value={bannerState.zoom}
+                                        onChange={(e) => setBannerState({ ...bannerState, zoom: parseFloat(e.target.value) })}
+                                        className="w-full h-1 bg-white/50 rounded-lg appearance-none cursor-pointer"
+                                    />
+                                    <ZoomIn size={16} className="text-white" />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
-                    <div className="flex-grow mt-[295px] px-6 space-y-4">
+                    <div className={`flex-grow px-6 space-y-4 ${bannerState.showBanner !== false ? 'mt-[295px]' : 'mt-[100px]'}`}>
                         {state.months.map(month => {
                             const dates = getDatesForWeeks(month);
                             return (
-                                <div key={month.id} className="rounded-lg overflow-hidden border border-zinc-200">
-                                    <table className="w-full border-collapse">
-                                        <thead>
-                                            <tr style={getStyleString(state.styles.header)}>
-                                                <th className="p-2 text-center border-r border-white/30 w-1/4" style={getStyleString(state.styles.header)}>
+                                <div key={month.id} className="shadow-sm" style={{ border: '1px solid #cbd5e1', borderRadius: '0.5rem', boxSizing: 'border-box', backgroundColor: '#ffffff', overflow: 'hidden', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+                                    <table className="w-full" style={{ borderCollapse: 'separate', borderSpacing: 0, width: '100%' }}>
+                                        <thead style={{ backgroundColor: '#f8fafc', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+                                            <tr>
+                                                <th className="p-2 text-center w-[15%] text-xs font-semibold tracking-wider text-slate-700" style={{ ...getStyleString(state.styles.header), borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', boxSizing: 'border-box', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
                                                     {getMonthName(month.monthIndex, state.language).toUpperCase()}
                                                 </th>
                                                 {state.template === 'acomodadores' ? (
                                                     <>
-                                                        <th className="p-2 text-center border-r border-white/30" style={getStyleString(state.styles.header)}>{t.door}</th>
-                                                        <th className="p-2 text-center border-r border-white/30" style={getStyleString(state.styles.header)}>{t.auditorium}</th>
-                                                        <th className="p-2 text-center border-r border-white/30" style={getStyleString(state.styles.header)}>{t.mic1}</th>
-                                                        <th className="p-2 text-center" style={getStyleString(state.styles.header)}>{t.mic2}</th>
+                                                        <th className="p-2 text-center text-xs font-semibold tracking-wider text-slate-700" style={{ ...getStyleString(state.styles.header), borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', boxSizing: 'border-box', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>{t.door}</th>
+                                                        <th className="p-2 text-center text-xs font-semibold tracking-wider text-slate-700" style={{ ...getStyleString(state.styles.header), borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', boxSizing: 'border-box', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>{t.auditorium}</th>
+                                                        <th className="p-2 text-center text-xs font-semibold tracking-wider text-slate-700" style={{ ...getStyleString(state.styles.header), borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', boxSizing: 'border-box', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>{t.mic1}</th>
+                                                        <th className="p-2 text-center text-xs font-semibold tracking-wider text-slate-700" style={{ ...getStyleString(state.styles.header), borderBottom: '1px solid #cbd5e1', boxSizing: 'border-box', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>{t.mic2}</th>
                                                     </>
                                                 ) : (
-                                                    <th className="p-2 text-center" style={getStyleString(state.styles.header)}>{t.assignedGroup}</th>
+                                                    <th className="p-2 text-center text-xs font-semibold tracking-wider text-slate-700" style={{ ...getStyleString(state.styles.header), borderBottom: '1px solid #cbd5e1', boxSizing: 'border-box', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>{t.assignedGroup}</th>
                                                 )}
                                             </tr>
                                         </thead>
                                         <tbody style={getStyleString(state.styles.cell)}>
                                             {dates.length > 0 ? dates.map((dateStr, idx) => {
                                                 const weekData = month.weeks[idx] || { id: '', door: '', auditorium: '', mic1: '', mic2: '', group: '' };
+                                                const isLastRow = idx === dates.length - 1;
+                                                const rowBorder = isLastRow ? 'none' : '1px solid #cbd5e1';
+
                                                 return (
-                                                    <tr key={idx} className={`transition-colors hover:bg-blue-50/50 dark:hover:bg-blue-900/10 ${idx % 2 === 0 ? 'bg-white' : 'bg-zinc-50'} border-b border-zinc-200`}>
-                                                        <td className="p-2 text-center font-bold border-r border-zinc-300">{dateStr}</td>
+                                                    <tr key={idx} className={`transition-colors hover:bg-slate-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`} style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+                                                        <td className="p-2 text-center font-semibold text-slate-800" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>{dateStr}</td>
                                                         {state.template === 'acomodadores' ? (
                                                             <>
-                                                                <td className="p-2 text-center border-r border-zinc-300">{weekData.door}</td>
-                                                                <td className="p-2 text-center border-r border-zinc-300">{weekData.auditorium}</td>
-                                                                <td className="p-2 text-center border-r border-zinc-300">{weekData.mic1}</td>
-                                                                <td className="p-2 text-center">{weekData.mic2}</td>
+                                                                <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>{weekData.door}</td>
+                                                                <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>{weekData.auditorium}</td>
+                                                                <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>{weekData.mic1}</td>
+                                                                <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, boxSizing: 'border-box' }}>{weekData.mic2}</td>
                                                             </>
                                                         ) : (
-                                                            <td className="p-2 text-center">{weekData.group}</td>
+                                                            <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, boxSizing: 'border-box' }}>{weekData.group}</td>
                                                         )}
                                                     </tr>
                                                 );
                                             }) : (
                                                 <tr>
-                                                    <td colSpan={5} className="p-6 text-center text-zinc-400">
-                                                        <div className="flex flex-col items-center justify-center gap-1">
-                                                            <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center mb-1">
-                                                                <CalendarDays size={16} className="text-zinc-400" />
+                                                    <td colSpan={5} className="p-6 text-center" style={{ borderTop: '1px solid #cbd5e1', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
+                                                        <div className="flex flex-col items-center justify-center gap-2">
+                                                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mb-1">
+                                                                <CalendarDays size={18} className="text-slate-500" />
                                                             </div>
-                                                            <p className="font-medium text-zinc-600 text-sm">{t.noDatesTitle}</p>
-                                                            <p className="text-[10px] text-zinc-500">{t.noDatesDesc}</p>
+                                                            <p className="font-semibold text-slate-700 text-sm">{t.noDatesTitle}</p>
+                                                            <p className="text-[10px] text-slate-500">{t.noDatesDesc}</p>
                                                         </div>
                                                     </td>
                                                 </tr>

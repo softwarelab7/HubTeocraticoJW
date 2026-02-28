@@ -43,6 +43,7 @@ export interface BannerState {
   zoom: number;
   x: number;
   y: number;
+  showBanner?: boolean;
 }
 
 export interface AppState {
