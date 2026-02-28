@@ -5,6 +5,8 @@ import { INITIAL_STYLES, TRANSLATIONS, THEME_COLORS } from './constants';
 import { ContentControl } from './components/ContentControl';
 import { StyleControl } from './components/StyleControl';
 import { Preview } from './components/Preview';
+import { useVersionCheck } from './hooks/useVersionCheck';
+import { UpdatePopup } from './components/UpdatePopup';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'content' | 'styles'>('content');
@@ -15,6 +17,8 @@ export default function App() {
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+
+  const isUpdateAvailable = useVersionCheck();
 
   const [state, setState] = useState<AppState>(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('HUB_TEOCRATICO_STATE_V1') : null;
@@ -382,6 +386,8 @@ export default function App() {
               </div>
             </div>
           )}
+
+        <UpdatePopup isUpdateAvailable={isUpdateAvailable} />
       </div>
     </div>
   );
