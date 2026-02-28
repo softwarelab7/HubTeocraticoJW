@@ -119,10 +119,10 @@ export const Preview: React.FC<Props> = ({ state, updateState, isGenerating }) =
     }, [state.styles.title.fontSize, state.template, state.language]);
 
     return (
-        <div className="flex justify-center w-full" style={{ height: 1056 * scale, marginBottom: 20 }}>
+        <div className="flex justify-center w-full min-h-full pb-[10px]" style={{ height: 1056 * scale, marginBottom: 20 }}>
             <div
                 id="pdf-content"
-                className="w-[816px] min-h-[1056px] bg-white shadow-xl text-black flex flex-col transition-all origin-top"
+                className="w-[816px] min-w-[816px] shrink-0 min-h-[1056px] bg-white shadow-xl text-black flex flex-col transition-all origin-top"
                 style={{ transform: `scale(${scale})` }}
             >
                 <div className="flex flex-col h-full flex-grow relative pb-8">

@@ -12,6 +12,7 @@ export default function App() {
   const [openStyles, setOpenStyles] = useState<Record<string, boolean>>({ title: false, header: false, cell: false, footer: false });
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
@@ -62,12 +63,13 @@ export default function App() {
     const closeMenu = () => {
       setIsLangMenuOpen(false);
       setIsThemeMenuOpen(false);
+      setIsExportMenuOpen(false);
     };
-    if (isLangMenuOpen || isThemeMenuOpen) {
+    if (isLangMenuOpen || isThemeMenuOpen || isExportMenuOpen) {
       window.addEventListener('click', closeMenu);
     }
     return () => window.removeEventListener('click', closeMenu);
-  }, [isLangMenuOpen, isThemeMenuOpen]);
+  }, [isLangMenuOpen, isThemeMenuOpen, isExportMenuOpen]);
 
   useEffect(() => {
     const themeColor = THEME_COLORS.find(c => c.id === state.colorTheme) || THEME_COLORS[0];
@@ -146,25 +148,7 @@ export default function App() {
   };
 
   const handlePrint = () => {
-    const content = document.getElementById('pdf-content');
-    if (!content) return;
-
-    // @ts-ignore
-    if (typeof window.html2pdf !== 'undefined') {
-      const opt = {
-        margin: 0,
-        filename: 'program.pdf',
-        image: { type: 'jpeg', quality: 1.0 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
-        jsPDF: { unit: 'px', format: [816, 1056], orientation: 'portrait' }
-      };
-      // @ts-ignore
-      window.html2pdf().from(content).set(opt).toPdf().get('pdf').then((pdf: any) => {
-        window.open(pdf.output('bloburl'), '_blank');
-      });
-    } else {
-      window.print();
-    }
+    window.print();
   };
 
   const downloadPDF = () => {
@@ -335,30 +319,23 @@ export default function App() {
 
         {/* Preview Area */}
         <main className={`flex-1 bg-zinc-100 dark:bg-zinc-950 overflow-y-auto p-4 md:p-12 scrollbar-thin ${mobileView === 'editor' ? 'hidden min-[1050px]:block' : 'block'}`}>
-          <div className="max-w-[210mm] mx-auto scale-[0.6] sm:scale-[0.8] md:scale-100 origin-top transition-transform duration-500 pb-20 md:pb-0">
+          <div className="max-w-[210mm] mx-auto origin-top transition-transform duration-500 pb-20 md:pb-0">
             <Preview state={state} updateState={updateState} isGenerating={isGeneratingPDF} />
           </div>
         </main>
 
         {/* Floating Action Buttons */}
-        <div className={`fixed bottom-6 right-6 flex flex-col gap-3 z-40 print:hidden transition-all duration-300 ${mobileView === 'editor' && 'max-[1050px]:hidden'}`}>
-          <button
-            onClick={handlePrint}
-            className="w-14 h-14 bg-white dark:bg-zinc-800 text-zinc-500 hover:text-primary rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-zinc-200 dark:border-white/10"
-            title="Imprimir"
-          >
-            <Printer size={24} />
-          </button>
+        <div className={`fixed bottom-6 right-6 flex flex-col items-end gap-3 z-40 print:hidden transition-all duration-300 ${mobileView === 'editor' && 'max-[1050px]:hidden'}`}>
           <button
             onClick={downloadPDF}
             disabled={isGeneratingPDF}
             className="w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-primary/40 disabled:opacity-50"
-            title="Descargar PDF"
+            title="Imprimir / Descargar PDF"
           >
             {isGeneratingPDF ? (
               <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              <Download size={24} />
+              <Download size={24} className="transition-transform duration-300" />
             )}
           </button>
         </div>
