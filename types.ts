@@ -19,6 +19,7 @@ export interface StylesState {
   cell: StyleConfig;
   footer: StyleConfig;
   footerText: string;
+  documentTitle?: string;
 }
 
 export interface WeekData {

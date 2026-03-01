@@ -332,79 +332,20 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
                     </div>
 
                     {month.weeks.map((week, idx) => (
-                      <div key={week.id} className="border-l-2 border-zinc-100 dark:border-zinc-800 hover:border-primary/50 transition-colors pl-3">
-                        <div
-                          className="flex items-center justify-between py-2 cursor-pointer select-none group/week"
-                          onClick={() => toggleWeek(week.id)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs font-bold uppercase transition-colors ${openWeeks[week.id] ? 'text-primary' : 'text-zinc-500 group-hover/week:text-zinc-700 dark:group-hover/week:text-zinc-300'}`}>
-                              {t.week} {idx + 1}
-                            </span>
-                            <div className={`transition-transform duration-200 ${openWeeks[week.id] ? 'rotate-180' : ''}`}>
-                              <ChevronDown size={14} className="text-zinc-400 group-hover/week:text-primary transition-colors" />
-                            </div>
-                          </div>
-
-                          <button
-                            className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all opacity-0 group-hover/week:opacity-100"
-                            onClick={(e) => { e.stopPropagation(); removeWeek(month.id, week.id); }}
-                            title={t.remove}
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                      <div key={week.id} className="flex items-center justify-between border-l-2 border-zinc-100 dark:border-zinc-800 hover:border-primary/50 transition-colors pl-3 py-2 group/week">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase text-zinc-500">
+                            {t.week} {idx + 1}
+                          </span>
                         </div>
 
-                        {(openWeeks[week.id] === undefined || openWeeks[week.id]) && (
-                          <div className="pb-3 grid grid-cols-2 gap-2.5 animate-in slide-in-from-left-2 duration-200">
-                            {state.template === 'acomodadores' ? (
-                              <>
-                                <label className="col-span-1 space-y-1">
-                                  <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tight">{t.door}</span>
-                                  <input
-                                    className="w-full rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs h-8 px-2 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
-                                    value={week.door}
-                                    onChange={(e) => updateWeek(month.id, week.id, 'door', e.target.value)}
-                                  />
-                                </label>
-                                <label className="col-span-1 space-y-1">
-                                  <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tight">{t.auditorium}</span>
-                                  <input
-                                    className="w-full rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-black/20 text-xs h-8 px-2 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
-                                    value={week.auditorium}
-                                    onChange={(e) => updateWeek(month.id, week.id, 'auditorium', e.target.value)}
-                                  />
-                                </label>
-                                <label className="col-span-1 space-y-1">
-                                  <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tight">{t.mic1}</span>
-                                  <input
-                                    className="w-full rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs h-8 px-2 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
-                                    value={week.mic1}
-                                    onChange={(e) => updateWeek(month.id, week.id, 'mic1', e.target.value)}
-                                  />
-                                </label>
-                                <label className="col-span-1 space-y-1">
-                                  <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tight">{t.mic2}</span>
-                                  <input
-                                    className="w-full rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs h-8 px-2 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
-                                    value={week.mic2}
-                                    onChange={(e) => updateWeek(month.id, week.id, 'mic2', e.target.value)}
-                                  />
-                                </label>
-                              </>
-                            ) : (
-                              <label className="col-span-2 space-y-1">
-                                <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tight">{t.groupName}</span>
-                                <input
-                                  className="w-full rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs h-9 px-2 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
-                                  value={week.group}
-                                  onChange={(e) => updateWeek(month.id, week.id, 'group', e.target.value)}
-                                  placeholder="Grupo..."
-                                />
-                              </label>
-                            )}
-                          </div>
-                        )}
+                        <button
+                          className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all opacity-0 group-hover/week:opacity-100"
+                          onClick={(e) => { e.stopPropagation(); removeWeek(month.id, week.id); }}
+                          title={t.remove}
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     ))}
 
@@ -447,6 +388,6 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
         </div>
 
       </div>
-    </div>
+    </div >
   );
 };

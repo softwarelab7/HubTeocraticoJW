@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { AppState, MonthData, StyleConfig } from '../types';
 import { TRANSLATIONS, getMonthName } from '../constants';
 import { ZoomIn, ZoomOut, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Image as ImageIcon, CalendarDays } from 'lucide-react';
+import { useNameHistory } from '../hooks/useNameHistory';
 
 interface Props {
     state: AppState;
@@ -24,6 +25,7 @@ const getStyleString = (config: StyleConfig) => {
 
 export const Preview: React.FC<Props> = ({ state, updateState, isGenerating }) => {
     const t = TRANSLATIONS[state.language];
+    const { names: nameHistory, addName } = useNameHistory();
     const bannerState = state.banner;
 
     const setBannerState = (b: AppState['banner']) => {
@@ -127,21 +129,42 @@ export const Preview: React.FC<Props> = ({ state, updateState, isGenerating }) =
             >
                 <div className="flex flex-col h-full flex-grow relative pb-8">
                     <div
-                        className="w-full px-6 text-center z-20 pointer-events-none"
+                        className="w-full px-6 text-center z-20 pointer-events-none flex justify-center"
                         style={{ position: 'absolute', top: '1rem', left: 0 }}
                     >
-                        <h2
-                            ref={titleRef}
-                            style={{
-                                ...getStyleString(state.styles.title),
-                                fontSize: `${adjustedTitleFontSize}px`,
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden'
-                            }}
-                            className="pointer-events-auto inline-block"
-                        >
-                            {state.template === 'acomodadores' ? t.previewTitleUshers : t.previewTitleCleaning}
-                        </h2>
+                        {isGenerating ? (
+                            <h2
+                                ref={titleRef}
+                                style={{
+                                    ...getStyleString(state.styles.title),
+                                    fontSize: `${adjustedTitleFontSize}px`,
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden'
+                                }}
+                                className="pointer-events-auto inline-block"
+                            >
+                                {state.styles.documentTitle || (state.template === 'acomodadores' ? t.previewTitleUshers : t.previewTitleCleaning)}
+                            </h2>
+                        ) : (
+                            <input
+                                ref={titleRef as any}
+                                type="text"
+                                style={{
+                                    ...getStyleString(state.styles.title),
+                                    fontSize: `${adjustedTitleFontSize}px`,
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    background: 'transparent',
+                                    border: 'none',
+                                    outline: 'none',
+                                    textAlign: 'center',
+                                    width: '100%',
+                                }}
+                                className="pointer-events-auto inline-block hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:bg-black/5 dark:focus:bg-white/5 rounded px-2"
+                                value={state.styles.documentTitle ?? (state.template === 'acomodadores' ? t.previewTitleUshers : t.previewTitleCleaning)}
+                                onChange={(e) => updateState({ styles: { ...state.styles, documentTitle: e.target.value } })}
+                            />
+                        )}
                     </div>
 
                     {bannerState.showBanner !== false && (
@@ -229,13 +252,124 @@ export const Preview: React.FC<Props> = ({ state, updateState, isGenerating }) =
                                                         <td className="p-2 text-center font-semibold text-slate-800" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>{dateStr}</td>
                                                         {state.template === 'acomodadores' ? (
                                                             <>
-                                                                <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>{weekData.door}</td>
-                                                                <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>{weekData.auditorium}</td>
-                                                                <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>{weekData.mic1}</td>
-                                                                <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, boxSizing: 'border-box' }}>{weekData.mic2}</td>
+                                                                <td className="p-0 text-center" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>
+                                                                    <input
+                                                                        type="text"
+                                                                        list="name-suggestions"
+                                                                        value={weekData.door}
+                                                                        onBlur={(e) => addName(e.target.value)}
+                                                                        onChange={(e) => {
+                                                                            const newMonths = [...state.months];
+                                                                            const mIdx = newMonths.findIndex(m => m.id === month.id);
+                                                                            if (mIdx >= 0) {
+                                                                                const newWeeks = [...newMonths[mIdx].weeks];
+                                                                                const wIdx = newWeeks.findIndex(w => w.id === weekData.id);
+                                                                                if (wIdx >= 0) {
+                                                                                    newWeeks[wIdx] = { ...newWeeks[wIdx], door: e.target.value };
+                                                                                    newMonths[mIdx] = { ...newMonths[mIdx], weeks: newWeeks };
+                                                                                    updateState({ months: newMonths });
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                        className={`w-full h-full text-center bg-transparent border-none outline-none focus:ring-2 focus:ring-primary/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-text ${isGenerating ? 'pointer-events-none' : ''}`}
+                                                                        style={{ padding: '0.5rem', color: 'inherit', font: 'inherit' }}
+                                                                    />
+                                                                </td>
+                                                                <td className="p-0 text-center" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>
+                                                                    <input
+                                                                        type="text"
+                                                                        list="name-suggestions"
+                                                                        value={weekData.auditorium}
+                                                                        onBlur={(e) => addName(e.target.value)}
+                                                                        onChange={(e) => {
+                                                                            const newMonths = [...state.months];
+                                                                            const mIdx = newMonths.findIndex(m => m.id === month.id);
+                                                                            if (mIdx >= 0) {
+                                                                                const newWeeks = [...newMonths[mIdx].weeks];
+                                                                                const wIdx = newWeeks.findIndex(w => w.id === weekData.id);
+                                                                                if (wIdx >= 0) {
+                                                                                    newWeeks[wIdx] = { ...newWeeks[wIdx], auditorium: e.target.value };
+                                                                                    newMonths[mIdx] = { ...newMonths[mIdx], weeks: newWeeks };
+                                                                                    updateState({ months: newMonths });
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                        className={`w-full h-full text-center bg-transparent border-none outline-none focus:ring-2 focus:ring-primary/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-text ${isGenerating ? 'pointer-events-none' : ''}`}
+                                                                        style={{ padding: '0.5rem', color: 'inherit', font: 'inherit' }}
+                                                                    />
+                                                                </td>
+                                                                <td className="p-0 text-center" style={{ borderBottom: rowBorder, borderRight: '1px solid #cbd5e1', boxSizing: 'border-box' }}>
+                                                                    <input
+                                                                        type="text"
+                                                                        list="name-suggestions"
+                                                                        value={weekData.mic1}
+                                                                        onBlur={(e) => addName(e.target.value)}
+                                                                        onChange={(e) => {
+                                                                            const newMonths = [...state.months];
+                                                                            const mIdx = newMonths.findIndex(m => m.id === month.id);
+                                                                            if (mIdx >= 0) {
+                                                                                const newWeeks = [...newMonths[mIdx].weeks];
+                                                                                const wIdx = newWeeks.findIndex(w => w.id === weekData.id);
+                                                                                if (wIdx >= 0) {
+                                                                                    newWeeks[wIdx] = { ...newWeeks[wIdx], mic1: e.target.value };
+                                                                                    newMonths[mIdx] = { ...newMonths[mIdx], weeks: newWeeks };
+                                                                                    updateState({ months: newMonths });
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                        className={`w-full h-full text-center bg-transparent border-none outline-none focus:ring-2 focus:ring-primary/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-text ${isGenerating ? 'pointer-events-none' : ''}`}
+                                                                        style={{ padding: '0.5rem', color: 'inherit', font: 'inherit' }}
+                                                                    />
+                                                                </td>
+                                                                <td className="p-0 text-center" style={{ borderBottom: rowBorder, boxSizing: 'border-box' }}>
+                                                                    <input
+                                                                        type="text"
+                                                                        list="name-suggestions"
+                                                                        value={weekData.mic2}
+                                                                        onBlur={(e) => addName(e.target.value)}
+                                                                        onChange={(e) => {
+                                                                            const newMonths = [...state.months];
+                                                                            const mIdx = newMonths.findIndex(m => m.id === month.id);
+                                                                            if (mIdx >= 0) {
+                                                                                const newWeeks = [...newMonths[mIdx].weeks];
+                                                                                const wIdx = newWeeks.findIndex(w => w.id === weekData.id);
+                                                                                if (wIdx >= 0) {
+                                                                                    newWeeks[wIdx] = { ...newWeeks[wIdx], mic2: e.target.value };
+                                                                                    newMonths[mIdx] = { ...newMonths[mIdx], weeks: newWeeks };
+                                                                                    updateState({ months: newMonths });
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                        className={`w-full h-full text-center bg-transparent border-none outline-none focus:ring-2 focus:ring-primary/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-text ${isGenerating ? 'pointer-events-none' : ''}`}
+                                                                        style={{ padding: '0.5rem', color: 'inherit', font: 'inherit' }}
+                                                                    />
+                                                                </td>
                                                             </>
                                                         ) : (
-                                                            <td className="p-2 text-center text-slate-700" style={{ borderBottom: rowBorder, boxSizing: 'border-box' }}>{weekData.group}</td>
+                                                            <td className="p-0 text-center" style={{ borderBottom: rowBorder, boxSizing: 'border-box' }}>
+                                                                <input
+                                                                    type="text"
+                                                                    list="name-suggestions"
+                                                                    value={weekData.group}
+                                                                    onBlur={(e) => addName(e.target.value)}
+                                                                    onChange={(e) => {
+                                                                        const newMonths = [...state.months];
+                                                                        const mIdx = newMonths.findIndex(m => m.id === month.id);
+                                                                        if (mIdx >= 0) {
+                                                                            const newWeeks = [...newMonths[mIdx].weeks];
+                                                                            const wIdx = newWeeks.findIndex(w => w.id === weekData.id);
+                                                                            if (wIdx >= 0) {
+                                                                                newWeeks[wIdx] = { ...newWeeks[wIdx], group: e.target.value };
+                                                                                newMonths[mIdx] = { ...newMonths[mIdx], weeks: newWeeks };
+                                                                                updateState({ months: newMonths });
+                                                                            }
+                                                                        }
+                                                                    }}
+                                                                    className={`w-full h-full text-center bg-transparent border-none outline-none focus:ring-2 focus:ring-primary/20 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-text ${isGenerating ? 'pointer-events-none' : ''}`}
+                                                                    style={{ padding: '0.5rem', color: 'inherit', font: 'inherit' }}
+                                                                    placeholder="Grupo..."
+                                                                />
+                                                            </td>
                                                         )}
                                                     </tr>
                                                 );
@@ -259,14 +393,44 @@ export const Preview: React.FC<Props> = ({ state, updateState, isGenerating }) =
                         })}
                     </div>
 
-                    {/* Footer */}
                     <div className="mt-4 pt-4 border-t border-zinc-100 text-center">
-                        <div
-                            style={getStyleString(state.styles.footer)}
-                            dangerouslySetInnerHTML={{ __html: state.styles.footerText }}
-                        />
+                        {isGenerating ? (
+                            <div
+                                style={getStyleString(state.styles.footer)}
+                                dangerouslySetInnerHTML={{ __html: state.styles.footerText }}
+                            />
+                        ) : (
+                            <textarea
+                                className="w-full bg-transparent border-none outline-none resize-none overflow-hidden text-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:bg-black/5 dark:focus:bg-white/5 rounded px-2"
+                                style={{
+                                    ...getStyleString(state.styles.footer),
+                                    minHeight: '60px'
+                                }}
+                                value={state.styles.footerText.replace(/<br\s*\/?>/gi, '\n')}
+                                onChange={(e) => {
+                                    // Convert line breaks back to <br> for HTML rendering compatibility
+                                    const htmlText = e.target.value.replace(/\n/g, '<br/>');
+                                    updateState({ styles: { ...state.styles, footerText: htmlText } });
+                                    // Auto-resize
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = (e.target.scrollHeight) + 'px';
+                                }}
+                                onInput={(e) => {
+                                    const target = e.target as HTMLTextAreaElement;
+                                    target.style.height = 'auto';
+                                    target.style.height = target.scrollHeight + 'px';
+                                }}
+                            />
+                        )}
                     </div>
                 </div>
+
+                {/* Datalist for names history auto-complete */}
+                <datalist id="name-suggestions">
+                    {nameHistory.map((name, i) => (
+                        <option key={i} value={name} />
+                    ))}
+                </datalist>
             </div>
         </div>
     );

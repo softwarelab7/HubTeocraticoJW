@@ -10,7 +10,6 @@ import { UpdatePopup } from './components/UpdatePopup';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'content' | 'styles'>('content');
-  const [mobileView, setMobileView] = useState<'editor' | 'preview'>('editor');
   const [openStyles, setOpenStyles] = useState<Record<string, boolean>>({ title: false, header: false, cell: false, footer: false });
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
@@ -188,24 +187,6 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
-          {/* Mobile View Toggle */}
-          <div className="flex min-[1050px]:hidden p-1 bg-zinc-100 dark:bg-zinc-800/50 rounded-lg">
-            <button
-              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${mobileView === 'editor' ? 'bg-white dark:bg-zinc-700 text-primary shadow-sm' : 'text-zinc-500'}`}
-              onClick={() => setMobileView('editor')}
-            >
-              Editor
-            </button>
-            <button
-              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${mobileView === 'preview' ? 'bg-white dark:bg-zinc-700 text-primary shadow-sm' : 'text-zinc-500'}`}
-              onClick={() => setMobileView('preview')}
-            >
-              Vista Previa
-            </button>
-          </div>
-
-          <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-800 hidden md:block" />
-
           {/* Theme & Extras */}
           <div className="flex items-center gap-2">
             {/* Language Selector */}
@@ -257,9 +238,9 @@ export default function App() {
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-col min-[1050px]:flex-row flex-1 overflow-y-auto overflow-x-hidden relative scrollbar-thin">
         {/* Sidebar */}
-        <aside className={`w-full min-[1050px]:w-[320px] flex-shrink-0 flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-white/5 z-10 ${mobileView === 'preview' ? 'hidden min-[1050px]:flex' : 'flex'}`}>
+        <aside className="w-full min-[1050px]:w-[320px] flex-shrink-0 flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-white/5 z-10 min-[1050px]:sticky min-[1050px]:top-0 min-[1050px]:h-full min-[1050px]:overflow-y-auto">
           <div className="flex border-b border-zinc-200 dark:border-white/5">
             <button
               className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'content' ? 'border-primary text-primary' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
@@ -277,7 +258,7 @@ export default function App() {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin">
+          <div className="flex-1 p-4 md:p-6 pb-8">
             {activeTab === 'content' ? (
               <ContentControl state={state} updateState={updateState} />
             ) : (
@@ -308,28 +289,20 @@ export default function App() {
                   isOpen={openStyles.footer} onToggle={() => toggleStyle('footer')}
                   accentColor="#f43f5e"
                 />
-                <div className="space-y-2 p-4 bg-zinc-50 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5">
-                  <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{t.footerText}</label>
-                  <textarea
-                    className="w-full bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/5 rounded-lg text-sm p-3 focus:ring-2 focus:ring-primary/20 transition-all outline-none min-h-[100px] resize-none"
-                    value={state.styles.footerText}
-                    onChange={(e) => updateStyle('footerText', e.target.value)}
-                  />
-                </div>
               </div>
             )}
           </div>
         </aside>
 
         {/* Preview Area */}
-        <main className={`flex-1 bg-zinc-100 dark:bg-zinc-950 overflow-y-auto p-4 md:p-12 scrollbar-thin ${mobileView === 'editor' ? 'hidden min-[1050px]:block' : 'block'}`}>
+        <main className="flex-1 bg-zinc-100 dark:bg-zinc-950 p-4 min-[1050px]:p-12 min-[1050px]:overflow-y-auto">
           <div className="max-w-[210mm] mx-auto origin-top transition-transform duration-500 pb-20 md:pb-0">
             <Preview state={state} updateState={updateState} isGenerating={isGeneratingPDF} />
           </div>
         </main>
 
         {/* Floating Action Buttons */}
-        <div className={`fixed bottom-6 right-6 flex flex-col items-end gap-3 z-40 print:hidden transition-all duration-300 ${mobileView === 'editor' && 'max-[1050px]:hidden'}`}>
+        <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-40 print:hidden transition-all duration-300">
           <button
             onClick={downloadPDF}
             disabled={isGeneratingPDF}
