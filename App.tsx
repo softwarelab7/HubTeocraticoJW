@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { LayoutGrid, Moon, Sun, Download, Printer, Settings, Palette, FileText, Languages, Check, RotateCcw, ChevronDown } from 'lucide-react';
 import { AppState, StylesState, Language } from './types';
 import { INITIAL_STYLES, TRANSLATIONS, THEME_COLORS } from './constants';
-import { ContentControl } from './components/ContentControl';
-import { StyleControl } from './components/StyleControl';
 import { Preview } from './components/Preview';
 import { useVersionCheck } from './hooks/useVersionCheck';
 import { UpdatePopup } from './components/UpdatePopup';
+import { TopToolbar } from './components/TopToolbar';
+import { MobileBottomToolbar } from './components/MobileBottomToolbar';
+import { MobileFormView } from './components/MobileFormView';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'content' | 'styles'>('content');
-  const [openStyles, setOpenStyles] = useState<Record<string, boolean>>({ title: false, header: false, cell: false, footer: false });
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
 
   const isUpdateAvailable = useVersionCheck();
 
@@ -122,10 +122,6 @@ export default function App() {
     }));
   }, []);
 
-  const toggleStyle = React.useCallback((section: string) => {
-    setOpenStyles(prev => ({ ...prev, [section]: !prev[section] }));
-  }, []);
-
   const resetState = () => {
     const initialState: AppState = {
       template: 'acomodadores',
@@ -171,7 +167,7 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans flex flex-col">
+    <div className="min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-sans flex flex-col">
       {/* Navbar */}
       <header className="h-16 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-white/5 flex items-center justify-between px-4 md:px-8 sticky top-0 z-50">
         <div className="flex items-center gap-3">
@@ -238,84 +234,47 @@ export default function App() {
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-col min-[1050px]:flex-row flex-1 overflow-y-auto overflow-x-hidden relative scrollbar-thin">
-        {/* Sidebar */}
-        <aside className="w-full min-[1050px]:w-[320px] flex-shrink-0 flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-white/5 z-10 min-[1050px]:sticky min-[1050px]:top-0 min-[1050px]:h-full min-[1050px]:overflow-y-auto">
-          <div className="flex border-b border-zinc-200 dark:border-white/5">
+      <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden relative scrollbar-thin">
+
+        <TopToolbar
+          state={state}
+          updateState={updateState}
+          updateStyle={updateStyle}
+          onDownload={downloadPDF}
+          isGeneratingPDF={isGeneratingPDF}
+        />
+
+        {/* Mobile Tabs Header */}
+        <div className="md:hidden sticky top-0 z-40 bg-zinc-100 dark:bg-zinc-950 p-2 border-b border-zinc-200 dark:border-white/5">
+          <div className="flex bg-zinc-200 dark:bg-zinc-900 rounded-xl p-1">
             <button
-              className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'content' ? 'border-primary text-primary' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-              onClick={() => setActiveTab('content')}
+              onClick={() => setMobileTab('form')}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mobileTab === 'form' ? 'bg-white dark:bg-zinc-800 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
             >
-              <FileText size={18} />
-              {t.content}
+              📝 Formulario
             </button>
             <button
-              className={`flex-1 py-4 text-sm font-bold flex items-center justify-center gap-2 border-b-2 transition-colors ${activeTab === 'styles' ? 'border-primary text-primary' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-              onClick={() => setActiveTab('styles')}
+              onClick={() => setMobileTab('preview')}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${mobileTab === 'preview' ? 'bg-white dark:bg-zinc-800 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
             >
-              <Palette size={18} />
-              {t.styles}
+              📄 Vista Previa
             </button>
           </div>
+        </div>
 
-          <div className="flex-1 p-4 md:p-6 pb-8">
-            {activeTab === 'content' ? (
-              <ContentControl state={state} updateState={updateState} />
-            ) : (
-              <div className="space-y-4">
-                <StyleControl
-                  title={t.mainTitle} config={state.styles.title}
-                  onChange={(c) => updateStyle('title', c)}
-                  isOpen={openStyles.title} onToggle={() => toggleStyle('title')}
-                  maxSize={46}
-                  accentColor="#3b82f6"
-                />
-                <StyleControl
-                  title={t.tableHeaders} config={state.styles.header}
-                  onChange={(c) => updateStyle('header', c)}
-                  isOpen={openStyles.header} onToggle={() => toggleStyle('header')}
-                  showBackground maxSize={14}
-                  accentColor="#10b981"
-                />
-                <StyleControl
-                  title={t.cellContent} config={state.styles.cell}
-                  onChange={(c) => updateStyle('cell', c)}
-                  isOpen={openStyles.cell} onToggle={() => toggleStyle('cell')}
-                  accentColor="#f59e0b"
-                />
-                <StyleControl
-                  title={t.footer} config={state.styles.footer}
-                  onChange={(c) => updateStyle('footer', c)}
-                  isOpen={openStyles.footer} onToggle={() => toggleStyle('footer')}
-                  accentColor="#f43f5e"
-                />
-              </div>
-            )}
+        {/* Main Content Area */}
+        <main className="flex-1 bg-zinc-100 dark:bg-zinc-950 px-2 py-4 md:p-8 min-[1050px]:p-12 min-[1050px]:flex min-[1050px]:justify-center w-full max-w-full overflow-x-hidden">
+
+          {/* Form View (Mobile Only) */}
+          <div className={`md:hidden ${mobileTab === 'form' ? 'block' : 'hidden'} w-full max-w-full overflow-hidden mx-auto`}>
+            <MobileFormView state={state} updateState={updateState} />
           </div>
-        </aside>
 
-        {/* Preview Area */}
-        <main className="flex-1 bg-zinc-100 dark:bg-zinc-950 p-4 min-[1050px]:p-12 min-[1050px]:overflow-y-auto">
-          <div className="max-w-[210mm] mx-auto origin-top transition-transform duration-500 pb-20 md:pb-0">
+          {/* Preview View (Desktop + Mobile Tab 'preview') */}
+          <div className={`${mobileTab === 'preview' ? 'block' : 'hidden'} md:block w-full max-w-[816px] origin-top transition-transform duration-500 pb-32 md:pb-0 mx-auto`}>
             <Preview state={state} updateState={updateState} isGenerating={isGeneratingPDF} />
           </div>
         </main>
-
-        {/* Floating Action Buttons */}
-        <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-40 print:hidden transition-all duration-300">
-          <button
-            onClick={downloadPDF}
-            disabled={isGeneratingPDF}
-            className="w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-primary/40 disabled:opacity-50"
-            title="Imprimir / Descargar PDF"
-          >
-            {isGeneratingPDF ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Download size={24} className="transition-transform duration-300" />
-            )}
-          </button>
-        </div>
 
         {
           isGeneratingPDF && (
@@ -361,6 +320,8 @@ export default function App() {
           )}
 
         <UpdatePopup isUpdateAvailable={isUpdateAvailable} />
+
+        <MobileBottomToolbar state={state} updateStyle={updateStyle} />
       </div>
     </div>
   );

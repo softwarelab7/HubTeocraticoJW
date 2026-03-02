@@ -157,79 +157,87 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
         <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider px-1">Configuración</h3>
 
         {/* Template Selector */}
-        <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
-          <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-2 uppercase">
-            {t.selectTemplate}
-          </label>
-          <Select
-            options={[
-              { value: 'acomodadores', label: t.templateUshers },
-              { value: 'aseo', label: t.templateCleaning }
-            ]}
-            value={state.template}
-            onChange={(value) => updateState({ template: value as TemplateType })}
-          />
-        </div>
-
-        {/* Banner Upload */}
-        <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-xl border border-zinc-200 dark:border-white/5">
-          <label className="block text-[10px] font-bold text-zinc-700 dark:text-zinc-300 mb-2 uppercase">
-            {t.banner}
-          </label>
-          <div className="flex bg-zinc-100 dark:bg-zinc-900/50 p-1 rounded-lg mb-3">
-            <button
-              onClick={() => updateState({ banner: { ...state.banner, showBanner: true } })}
-              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${state.banner.showBanner !== false ? 'bg-white dark:bg-zinc-700 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-            >
-              Mostrar
-            </button>
-            <button
-              onClick={() => updateState({ banner: { ...state.banner, showBanner: false } })}
-              className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${state.banner.showBanner === false ? 'bg-white dark:bg-zinc-700 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
-            >
-              Ocultar
-            </button>
+        <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-4">
+          {/* Template Selector */}
+          <div>
+            <label className="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 mb-1.5 uppercase tracking-wide">
+              {t.selectTemplate}
+            </label>
+            <Select
+              options={[
+                { value: 'acomodadores', label: t.templateUshers },
+                { value: 'aseo', label: t.templateCleaning }
+              ]}
+              value={state.template}
+              onChange={(value) => updateState({ template: value as TemplateType })}
+            />
           </div>
-          {state.banner.showBanner !== false && (
-            <div className="relative group">
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                id="banner-upload"
-                onChange={handleBannerUpload}
-              />
-              <label
-                htmlFor="banner-upload"
-                className={`flex items-center justify-center gap-3 w-full p-2.5 rounded-lg border-2 border-dashed cursor-pointer transition-all ${state.banner.image
-                  ? 'border-green-300 dark:border-green-800/50 hover:border-green-500 bg-green-50/30 dark:bg-green-900/10 hover:bg-green-50 dark:hover:bg-green-900/20'
-                  : 'border-red-300 dark:border-red-800/50 hover:border-red-500 bg-red-50/30 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20'
-                  }`}
-              >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${state.banner.image
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
-                  : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                  }`}>
-                  {state.banner.image ? <Check size={16} /> : <Upload size={16} />}
-                </div>
-                <span className={`text-xs font-medium ${state.banner.image ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
-                  {state.banner.image ? 'Banner Activo' : t.uploadBanner}
-                </span>
+
+          <div className="h-px bg-zinc-200 dark:bg-white/5 w-full" />
+
+          {/* Banner Upload */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+                {t.banner}
               </label>
-              {state.banner.image && (
+              <div className="flex bg-zinc-100 dark:bg-zinc-900/50 rounded-md overflow-hidden">
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    updateState({ banner: { ...state.banner, image: null } });
-                  }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors z-10"
-                  title="Eliminar Banner"
+                  onClick={() => updateState({ banner: { ...state.banner, showBanner: true } })}
+                  className={`px-2 py-1 text-[10px] font-bold transition-all ${state.banner.showBanner !== false ? 'bg-white dark:bg-zinc-700 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
                 >
-                  <Trash2 size={14} />
+                  Mostrar
                 </button>
-              )}
+                <button
+                  onClick={() => updateState({ banner: { ...state.banner, showBanner: false } })}
+                  className={`px-2 py-1 text-[10px] font-bold transition-all ${state.banner.showBanner === false ? 'bg-white dark:bg-zinc-700 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+                >
+                  Ocultar
+                </button>
+              </div>
             </div>
-          )}
+
+            {state.banner.showBanner !== false && (
+              <div className="relative group mt-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  id="banner-upload"
+                  onChange={handleBannerUpload}
+                />
+                <label
+                  htmlFor="banner-upload"
+                  className={`flex items-center justify-center gap-2 w-full p-2.5 rounded-lg border border-dashed cursor-pointer transition-all ${state.banner.image
+                    ? 'border-green-300 dark:border-green-800/50 hover:border-green-500 bg-green-50/50 dark:bg-green-900/10 hover:bg-green-50 dark:hover:bg-green-900/20'
+                    : 'border-zinc-300 dark:border-zinc-700 hover:border-primary bg-white dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                    }`}
+                >
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${state.banner.image
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500'
+                    }`}>
+                    {state.banner.image ? <Check size={14} /> : <Upload size={14} />}
+                  </div>
+                  <span className={`text-xs font-medium ${state.banner.image ? 'text-green-700 dark:text-green-300' : 'text-zinc-600 dark:text-zinc-400'}`}>
+                    {state.banner.image ? 'Banner Activo' : t.uploadBanner}
+                  </span>
+                </label>
+                {state.banner.image && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      updateState({ banner: { ...state.banner, image: null } });
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors z-10 opacity-0 group-hover:opacity-100"
+                    title="Eliminar Banner"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -246,30 +254,30 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
 
               {/* Month Header */}
               <div
-                className={`flex items-center justify-between p-4 cursor-pointer select-none transition-colors rounded-tr-xl ${openMonths[month.id] ? 'bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-700' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}`}
+                className={`flex items-center justify-between p-3 cursor-pointer select-none transition-colors rounded-tr-xl ${openMonths[month.id] ? 'bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-700' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}`}
                 onClick={() => toggleMonth(month.id)}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-sm ${monthColors[month.monthIndex % 12]}`}>
+                  <div className={`w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold text-white shadow-sm ${monthColors[month.monthIndex % 12]}`}>
                     {index + 1}
                   </div>
-                  <div>
-                    <h4 className="font-display font-semibold text-[15px] text-black dark:text-white tracking-tight">
+                  <div className="flex items-baseline gap-2">
+                    <h4 className="font-display font-semibold text-sm text-zinc-900 dark:text-zinc-100 tracking-tight">
                       {getMonthName(month.monthIndex, state.language)} {month.year}
                     </h4>
-                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium tracking-wide uppercase mt-0.5">{month.weeks.length} Semanas</p>
+                    <span className="text-[10px] text-zinc-400 font-medium bg-zinc-100 dark:bg-white/5 px-1.5 py-0.5 rounded-full">{month.weeks.length} Semanas</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={(e) => { e.stopPropagation(); removeMonth(month.id); }}
-                    className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                    className="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors opacity-0 group-hover:opacity-100"
                     title={t.remove}
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={14} />
                   </button>
                   <div className={`transition-transform duration-200 ${openMonths[month.id] ? 'rotate-180' : ''}`}>
-                    <ChevronDown size={18} className="text-zinc-400" />
+                    <ChevronDown size={16} className="text-zinc-400" />
                   </div>
                 </div>
               </div>
@@ -307,15 +315,15 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
                   </div>
 
                   {/* Day Selector */}
-                  <div className="bg-zinc-50 dark:bg-black/20 p-3 rounded-xl border border-dashed border-zinc-200 dark:border-white/10">
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 mb-2 block text-center">{t.meetingDay}</span>
+                  <div className="bg-zinc-50 dark:bg-black/20 p-2.5 rounded-xl border border-dashed border-zinc-200 dark:border-white/10">
+                    <span className="text-[10px] uppercase font-bold text-zinc-400 mb-1.5 block text-center">{t.meetingDay}</span>
                     <div className="flex justify-between gap-1">
                       {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map((day, i) => (
                         <button
                           key={i}
                           onClick={() => toggleDay(month.id, i)}
-                          className={`w-8 h-8 rounded-lg text-xs font-bold flex items-center justify-center transition-all ${month.selectedDays.includes(i)
-                            ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105'
+                          className={`w-7 h-7 rounded-md text-xs font-bold flex items-center justify-center transition-all ${month.selectedDays.includes(i)
+                            ? 'bg-primary text-white shadow-md scale-105'
                             : 'bg-white dark:bg-zinc-800 text-zinc-400 hover:text-primary hover:bg-primary/5 dark:hover:bg-zinc-700'
                             }`}
                         >
@@ -326,35 +334,33 @@ export const ContentControl: React.FC<Props> = ({ state, updateState }) => {
                   </div>
 
                   {/* Weeks Data */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between px-1">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between px-1 mb-1">
                       <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Semanas</span>
+                      <button
+                        onClick={() => addWeek(month.id)}
+                        className="text-[10px] font-bold text-primary hover:bg-primary/10 px-2 py-0.5 rounded transition-colors flex items-center gap-1"
+                      >
+                        <Plus size={10} strokeWidth={3} /> {t.addWeek}
+                      </button>
                     </div>
 
-                    {month.weeks.map((week, idx) => (
-                      <div key={week.id} className="flex items-center justify-between border-l-2 border-zinc-100 dark:border-zinc-800 hover:border-primary/50 transition-colors pl-3 py-2 group/week">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold uppercase text-zinc-500">
-                            {t.week} {idx + 1}
+                    <div className="flex flex-wrap gap-2">
+                      {month.weeks.map((week, idx) => (
+                        <div key={week.id} className="flex items-center bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-md overflow-hidden pl-2 group/week">
+                          <span className="text-[10px] font-bold uppercase text-zinc-500 min-w-[36px]">
+                            S {idx + 1}
                           </span>
+                          <button
+                            className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all ml-1 border-l border-zinc-200 dark:border-zinc-700 flex items-center justify-center"
+                            onClick={(e) => { e.stopPropagation(); removeWeek(month.id, week.id); }}
+                            title={t.remove}
+                          >
+                            <Trash2 size={12} />
+                          </button>
                         </div>
-
-                        <button
-                          className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all opacity-0 group-hover/week:opacity-100"
-                          onClick={(e) => { e.stopPropagation(); removeWeek(month.id, week.id); }}
-                          title={t.remove}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    ))}
-
-                    <button
-                      onClick={() => addWeek(month.id)}
-                      className="w-full py-2 text-xs font-bold text-primary border border-dashed border-primary/30 rounded-lg hover:bg-primary/5 flex items-center justify-center gap-1.5 transition-all mt-2"
-                    >
-                      <Plus size={14} /> {t.addWeek}
-                    </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
