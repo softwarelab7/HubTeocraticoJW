@@ -8,7 +8,6 @@ import { UpdatePopup } from './components/UpdatePopup';
 import { TopToolbar } from './components/TopToolbar';
 import { MobileBottomToolbar } from './components/MobileBottomToolbar';
 import { MobileFormView } from './components/MobileFormView';
-import { exportToPDF } from './utils/pdfExport';
 
 export default function App() {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);

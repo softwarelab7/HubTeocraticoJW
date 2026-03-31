@@ -1,9 +1,18 @@
 # Estado del Proyecto: Hub Teocrático JW
 
-**Fecha:** 11 de Diciembre de 2025
-**Última acción:** Refinamiento del diseño del menú de estilos.
+**Fecha:** 31 de Marzo de 2026
+**Última acción:** Finalización de Exportación PDF Perfecta (Hoja Única).
 
 ## ✅ Tareas Completadas Recientemente:
+
+### 📅 31 de Marzo de 2026:
+1.  **Solución Definitiva de Exportación PDF (Ventana Emergente + Zoom):**
+    *   **Estrategia Nuclear:** Se abandonó `jsPDF` y `html2canvas` en favor de un enfoque de **ventana emergente limpia**.
+    *   **Escalado Perfecto (Zoom):** Se implementó un cálculo de `zoom` dinámico basado en la altura del contenido vs la altura de la página (11 pulgadas). Esto garantiza que **todo** el contenido quepa siempre en una sola hoja Carta sin cortes.
+    *   **Aislamiento de Ventana:** Al exportar a una instancia limpia de `window.open`, se eliminaron todos los conflictos de CSS, barras de herramientas y menús.
+    *   **Sincronización de Estilos:** Se automatizó el copiado de todos los estilos globales a la ventana de impresión para mantener la fidelidad visual.
+    *   **Limpieza de Código:** Se eliminó la dependencia innecesaria del archivo `pdfExport.ts`.
+    *   **Push Final:** Todos los cambios han sido sincronizados en el repositorio de GitHub.
 
 ### 📅 11 de Diciembre de 2025:
 1.  **Refinamiento del Menú de Estilos (StyleControl):**
