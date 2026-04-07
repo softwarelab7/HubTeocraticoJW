@@ -176,77 +176,48 @@ export default function App() {
     setIsResetModalOpen(false);
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   const downloadPDF = async () => {
     setIsGeneratingPDF(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
-
     const el = document.getElementById('pdf-content');
-    if (!el) { setIsGeneratingPDF(false); return; }
 
-    // Measure content
-    const contentHeight = el.scrollHeight;
-    const pageHeight = 1056; // 11in at 96dpi
-    const zoom = contentHeight > pageHeight ? (pageHeight / contentHeight) : 1;
+    if (el) {
+      // 1. Temporarily freeze dimensions matching the physical paper size (816px width)
+      const origWidth = el.style.width;
+      const origPosition = el.style.position;
+      const origZoom = el.style.zoom;
+      
+      el.style.transition = 'none';
+      el.style.position = 'absolute';
+      el.style.setProperty('width', '816px', 'important');
+      el.style.zoom = '1';
 
-    // Get all stylesheets
-    const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
-      .map(s => s.outerHTML).join('\n');
+      // Force synchronous reflow to get true printed height
+      void el.offsetHeight;
+      const contentHeight = el.scrollHeight;
+      const pageHeight = 1056; 
 
-    // Open print window with ONLY the pdf content
-    const printWindow = window.open('', '_blank', 'width=816,height=1056');
-    if (!printWindow) {
-      alert('Por favor permite ventanas emergentes para exportar.');
-      setIsGeneratingPDF(false);
-      return;
+      // 2. Apply scale if oversized
+      if (contentHeight > pageHeight) {
+         const ratio = pageHeight / contentHeight;
+         // Apply inverse width so it spans the full horizontal space cleanly
+         el.style.setProperty('width', `${(816 / ratio).toFixed(2)}px`, 'important');
+         el.style.zoom = ratio.toString();
+      }
+
+      // Allow DOM to paint
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.print();
+
+      // 3. Restore all original styles
+      el.style.zoom = origZoom;
+      el.style.width = origWidth;
+      el.style.position = origPosition;
+      el.style.transition = '';
+    } else {
+      window.print();
     }
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Exportar PDF</title>
-        ${styles}
-        <style>
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          html, body { margin: 0; padding: 0; background: white; }
-          body { zoom: ${zoom}; }
-          #pdf-content {
-            width: 816px;
-            box-shadow: none !important;
-            margin: 0;
-            padding: 0;
-          }
-          @page { size: letter portrait; margin: 0; }
-        </style>
-      </head>
-      <body>
-        ${el.outerHTML}
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
-
-    // Wait for images to load, then print
-    printWindow.onload = () => {
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-        setIsGeneratingPDF(false);
-      }, 500);
-    };
-
-    // Fallback if onload doesn't fire
-    setTimeout(() => {
-      try {
-        printWindow.print();
-        printWindow.close();
-      } catch(e) {}
-      setIsGeneratingPDF(false);
-    }, 3000);
+    
+    setIsGeneratingPDF(false);
   };
 
 
@@ -381,7 +352,7 @@ export default function App() {
           </div>
 
           {/* Preview View (Desktop + Mobile Tab 'preview') */}
-          <div className={`${mobileTab === 'preview' ? 'block' : 'hidden'} md:block w-full max-w-[816px] origin-top transition-transform duration-500 pb-32 md:pb-0 mx-auto print:p-0 print:m-0 print:max-w-none print:w-auto`}>
+          <div className={`${mobileTab === 'preview' ? 'block' : 'hidden'} md:block w-full max-w-[816px] origin-top transition-transform duration-500 pb-32 md:pb-0 mx-auto print:p-0 print:m-0 print:max-w-none print:w-auto print:block`}>
             <Preview state={state} updateState={updateState} isGenerating={isGeneratingPDF} />
           </div>
         </main>

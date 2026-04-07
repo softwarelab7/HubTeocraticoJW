@@ -18,7 +18,7 @@ export const MobileBottomToolbar: React.FC<Props> = ({ state, updateStyle }) => 
     };
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 z-40 p-2 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] pb-safe flex flex-col gap-2 transition-colors">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 z-40 p-2 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] pb-safe flex flex-col gap-2 transition-colors print:hidden">
 
             {/* Tabs for sections */}
             <div className="flex gap-1 bg-zinc-100 dark:bg-zinc-900/50 p-1 rounded-lg overflow-x-auto scrollbar-none">

@@ -80,70 +80,64 @@
 
     /* ===== PRINT STYLES ===== */
     @media print {
-
-      /* Force background colors and borders to print */
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
 
-      /* Hide everything except the PDF content */
-      body>#root>div>header,
-      body>#root>div>div>aside,
-      body>#root>div>div>div.fixed {
+      /* Hide UI */
+      header, .print\:hidden, [class*="print:hidden"], .no-print,
+      [class*="sticky"], .fixed {
         display: none !important;
       }
 
-      body {
+      html, body {
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
+        height: 100% !important;
+        overflow: hidden !important;
       }
 
-      /* Make the preview fill the page */
-      body>#root>div>div>main {
+      /* Flatten wrappers */
+      #root, #root > div, #root > div > div,
+      #root > div > main, #root > div > div > main {
         display: block !important;
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        background: white !important;
         overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        max-width: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
       }
 
-      /* Reset any scaling and center the content */
       #pdf-content {
-        transform: none !important;
-        width: 100% !important;
-        max-width: none !important;
-        min-height: unset !important;
-        box-shadow: none !important;
+        width: 816px !important;
+        min-height: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
+        box-shadow: none !important;
+        background: white !important;
+        /* zoom is set by JavaScript — do NOT override here */
       }
 
-      /* Override tailwind fixed widths */
-      .w-\[816px\] {
-        width: 100% !important;
+      #pdf-content input[type="text"],
+      #pdf-content textarea {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
       }
 
-      /* Remove hover effects in print */
-      tr:hover {
-        background-color: transparent !important;
-      }
-
-      /* Force print margins to None */
       @page {
         size: letter portrait;
-        margin: 0 !important;
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
+        margin: 0;
       }
     }
   </style>
 
-  <script type="module" crossorigin src="./assets/index-CmcdDFtn.js"></script>
+  <script type="module" crossorigin src="./assets/index-s0745hOk.js"></script>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200">
